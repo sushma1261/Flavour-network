@@ -24,10 +24,10 @@ def tsne_cluster_cuisine(df,sublist):
         df_sub = pd.concat([df_sub, temp],axis=0,ignore_index=True)
         lenlist.append(df_sub.shape[0])
     df_X = df_sub.drop(['cuisine','recipeName'],axis=1)
-    print df_X.shape, lenlist
+    print(df_X.shape, lenlist)
 
     dist = squareform(pdist(df_X, metric='cosine'))
-    tsne = TSNE(metric='precomputed').fit_transform(dist)
+    tsne = TSNE(metric='precomputed', init="random").fit_transform(dist)
 
     palette = sns.color_palette("hls", len(sublist))
     plt.figure(figsize=(10,10))
@@ -46,16 +46,16 @@ def plot_bokeh(df,sublist,filename):
         df_sub = pd.concat([df_sub, temp],axis=0,ignore_index=True)
         lenlist.append(df_sub.shape[0])
     df_X = df_sub.drop(['cuisine','recipeName'],axis=1)
-    print df_X.shape, lenlist
+    print(df_X.shape, lenlist)
 
     dist = squareform(pdist(df_X, metric='cosine'))
-    tsne = TSNE(metric='precomputed').fit_transform(dist)
+    tsne = TSNE(metric='precomputed', init="random").fit_transform(dist)
     #cannot use seaborn palette for bokeh
-    palette =['red','green','blue','yellow']
-    colors =[]
-    for i in range(len(sublist)):
-        for j in range(lenlist[i+1]-lenlist[i]):
-            colors.append(palette[i])
+    # palette =['red','green','blue','yellow']
+    # colors =[]
+    # for i in range(len(sublist)):
+    #     for j in range(lenlist[i+1]-lenlist[i]):
+    #         colors.append(palette[i])
     #plot with boken
     output_file(filename)
     source = ColumnDataSource(
@@ -67,10 +67,9 @@ def plot_bokeh(df,sublist,filename):
                 ("cuisine", "@cuisine"),
                 ("recipe", "@recipe")])
 
-    p = figure(plot_width=1000, plot_height=1000, tools=[hover],
-               title="flavor clustering")
+    p = figure(title="flavor clustering")
 
-    p.circle('x', 'y', size=10, source=source,fill_color=colors)
+    p.circle('x', 'y', size=10, source=source)
 
     show(p)
 
@@ -81,15 +80,16 @@ if __name__ == '__main__':
     yum_tfidf = pd.read_pickle('data/yum_tfidf.pkl')
 
     #select four cuisines and plot tsne clustering with ingredients
-    sublist = ['Italian','French','Japanese','Indian']
+    
     df_ingr = yum_ingrX.copy()
+    sublist = list(set(yum_ingr['cuisine']))
     df_ingr['cuisine'] = yum_ingr['cuisine']
     df_ingr['recipeName'] = yum_ingr['recipeName']
     tsne_cluster_cuisine(df_ingr,sublist)
 
     #select four cuisines and plot tsne clustering with flavor
-    sublist = ['Italian','French','Japanese','Indian']
     df_flavor = yum_tfidf.copy()
+    sublist = list(set(yum_ingr['cuisine']))
     df_flavor['cuisine'] = yum_ingr['cuisine']
     df_flavor['recipeName'] = yum_ingr['recipeName']
     tsne_cluster_cuisine(df_flavor,sublist)

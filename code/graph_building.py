@@ -33,7 +33,7 @@ df_subset = df_subset[df_subset['ingr2'].isin(all_ingredients)]
 ####build graph and extract backbone
 G1 = nx.Graph()
 weights ={}
-for i in xrange(df_subset.shape[0]):
+for i in range(df_subset.shape[0]):
     G1.add_edge(df_subset.iloc[i,0],df_subset.iloc[i,1])
     weights[df_subset.iloc[i,0],df_subset.iloc[i,1]] = df_subset.iloc[i,2]
     weights[df_subset.iloc[i,1],df_subset.iloc[i,0]] = df_subset.iloc[i,2]
